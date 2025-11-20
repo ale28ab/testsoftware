@@ -1,0 +1,33 @@
+ name: Flujo de trabajo de CI de Python
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Configurar Python 3.8
+      uses: actions/setup-python@v5
+      with:
+        python-version: "3.8"
+
+    - name: Instalar dependencias
+      run: |
+        python -m pip install --upgrade pip
+        pip install flask
+
+    - name: Analizar el código con un linter (flake8)
+      run: |
+        pip install flake8
+        # Detener la compilación si hay errores de sintaxis de Python o nombres no definidos
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # Salir con cero trata todos los errores como advertencias. El editor de GitHub tiene 127 caracteres de ancho
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
